@@ -1,22 +1,15 @@
 import React, { useState, useEffect } from "react";
-import {
-  Box,
-  Button,
-  Grid,
-  InputAdornment,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Grid, Typography } from "@mui/material";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import TableDetail from "./TableDetail";
 import dummyData from "../dummy.json";
-import SearchIcon from "@mui/icons-material/Search";
+import { getData, searchData } from "../services/api";
+import TableData from "./TableData";
+import axios from "axios";
 const ProductData = () => {
   const [dates, setDates] = useState({ startDate: "", endDate: "" });
   const [data, setData] = useState(null);
-  const [filterData, setFilterData] = useState("");
-const [isData,setIsdata]=useState(false);
+  const [isData, setIsdata] = useState(false);
   const hanldeDateRange = () => {
     const converDateFormate = (date) => {
       const inputDate = new Date(date);
@@ -25,31 +18,46 @@ const [isData,setIsdata]=useState(false);
       const day = inputDate.getDate().toString().padStart(2, "0");
       const formattedDate = `${year}-${month}-${day}`;
       return formattedDate;
-
     };
     let dateRange = `StartDate^${converDateFormate(
       dates.startDate
     )}|EndDate^${converDateFormate(dates.endDate)}`;
     console.log("==>", dateRange);
-    setIsdata(!isData)
+    searchData({
+      id: 101,
+      title: "iPhone 9",
+      description: "An apple mobile which is nothing like apple",
+      price: 549,
+      discountPercentage: 12.96,
+      rating: 4.69,
+      stock: 94,
+      brand: "Apple",
+      category: "smartphones",
+      thumbnail: "https://i.dummyjson.com/data/products/1/thumbnail.jpg",
+      images: ["https://i.dummyjson.com/data/products/1/1.jpg"],
+    });
+    setIsdata(!isData);
   };
 
+  // useEffect(() => {
+  //   const flattenedArray = dummyData.map((item) => {
+  //     const flatObject = {
+  //       documentHandleId: item.documentHandleId,
+  //       documentName: item.documentName,
+  //       Description: item.keywords.Description,
+  //       DateOnDocument: item.keywords["Date on Document"],
+  //       InsuredName: item.keywords["Insured Name"],
+  //       Matter: item.keywords.Matter,
+  //     };
+  //     return flatObject;
+  //   });
+  //   if (isData) setData(flattenedArray);
+  // }, [dummyData, isData]);
   useEffect(() => {
-    const flattenedArray = dummyData.map((item) => {
-      const flatObject = {
-        documentHandleId: item.documentHandleId,
-        documentName: item.documentName,
-        Description: item.keywords.Description,
-        DateOnDocument: item.keywords["Date on Document"],
-        InsuredName: item.keywords["Insured Name"],
-        Matter: item.keywords.Matter,
-      };
-      return flatObject;
-    });
-    // debugger;
-   if(isData)
-   setData(flattenedArray);
-  }, [dummyData,isData]);
+    getData("https://dummyjson.com/products").then((res) =>
+      setData(res.products)
+    );
+  }, []);
   return (
     <Box>
       <Grid container spacing={2}>
@@ -96,35 +104,8 @@ const [isData,setIsdata]=useState(false);
             Search
           </Button>
         </Grid>
-        <Grid item xs={12} mt={3}>
-          <Box
-            sx={{ maxWidth: "100%", width: "400px", float: "right", m: "2em" }}
-          >
-            <TextField
-              fullWidth
-              value={filterData}
-              placeholder="Search Reacords"
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-              }}
-              variant="standard"
-              onChange={(e) => setFilterData(e.target.value)}
-            />
-          </Box>
-          <TableDetail
-            data={Array.isArray(data) ? data : []}
-            columnConfig={[
-              { name: "documentHandleId", label: "ID" },
-              { name: "Description", label: "Description " },
-              { name: "DateOnDocument", label: "Document Date" },
-              { name: "InsuredName", label: "Insured Name" },
-            ]}
-            searchData={filterData}
-          />
+        <Grid item xs={12}>
+          {isData && <TableData data={data} />}
         </Grid>
       </Grid>
     </Box>
