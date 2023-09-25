@@ -2,14 +2,16 @@ import React, { useState, useEffect } from "react";
 import { Box, Button, Grid, Typography } from "@mui/material";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import dummyData from "../dummy.json";
-import { getData, searchData } from "../services/api";
+import { searchData } from "../services/api";
 import TableData from "./TableData";
-import axios from "axios";
+
+
 const ProductData = () => {
   const [dates, setDates] = useState({ startDate: "", endDate: "" });
   const [data, setData] = useState(null);
+  const [tempData, setTempData] = useState(null);
   const [isData, setIsdata] = useState(false);
+
   const hanldeDateRange = () => {
     const converDateFormate = (date) => {
       const inputDate = new Date(date);
@@ -19,45 +21,34 @@ const ProductData = () => {
       const formattedDate = `${year}-${month}-${day}`;
       return formattedDate;
     };
+    // eslint-disable-next-line
     let dateRange = `StartDate^${converDateFormate(
       dates.startDate
     )}|EndDate^${converDateFormate(dates.endDate)}`;
-    console.log("==>", dateRange);
-    searchData({
-      id: 101,
-      title: "iPhone 9",
-      description: "An apple mobile which is nothing like apple",
-      price: 549,
-      discountPercentage: 12.96,
-      rating: 4.69,
-      stock: 94,
-      brand: "Apple",
-      category: "smartphones",
-      thumbnail: "https://i.dummyjson.com/data/products/1/thumbnail.jpg",
-      images: ["https://i.dummyjson.com/data/products/1/1.jpg"],
-    });
+
+    searchData({}).then((res) => setTempData(res));
     setIsdata(!isData);
   };
 
-  // useEffect(() => {
-  //   const flattenedArray = dummyData.map((item) => {
-  //     const flatObject = {
-  //       documentHandleId: item.documentHandleId,
-  //       documentName: item.documentName,
-  //       Description: item.keywords.Description,
-  //       DateOnDocument: item.keywords["Date on Document"],
-  //       InsuredName: item.keywords["Insured Name"],
-  //       Matter: item.keywords.Matter,
-  //     };
-  //     return flatObject;
-  //   });
-  //   if (isData) setData(flattenedArray);
-  // }, [dummyData, isData]);
   useEffect(() => {
-    getData("https://dummyjson.com/products").then((res) =>
-      setData(res.products)
-    );
-  }, []);
+    const flattenedArray = tempData?.map((item) => {
+      const flatObject = {
+        documentHandleId: item.documentHandleId,
+        documentName: item.documentName,
+        Description:
+          item.keywords.Description === undefined
+            ? "No Data Found"
+            : item.keywords.Description,
+        DateOnDocument: item.keywords["Date on Document"],
+        InsuredName: item.keywords["Insured Name"],
+        Matter: item.keywords.Matter,
+      };
+      return flatObject;
+    });
+    setData(flattenedArray);
+  }, [tempData]);
+
+  console.log(data);
   return (
     <Box>
       <Grid container spacing={2}>

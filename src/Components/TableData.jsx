@@ -2,23 +2,26 @@ import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 
 export default function TableData({ data }) {
   const columns = [
-    { field: "id", headerName: "ID", width: 70 },
-    { field: "title", headerName: "Title", width: 200 },
-    { field: "price", headerName: "Price" },
+    { field: "documentHandleId", headerName: "ID", flex: 1,maxWidth: 100, },
+    { field: "documentName", headerName: "Title", flex: 1, },
+    { field: "Description", headerName: "Price",flex: 1,minWidth: 100, },
     {
-      field: "discountPercentage",
+      field: "DateOnDocument",
       headerName: "Discount Percentage",
+      flex: 1,
+      maxWidth: 200,
     },
     {
-      field: "description",
+      field: "InsuredName",
       headerName: "Description",
       sortable: false,
-      width: 300,
+      flex: 1
     },
   ];
 
   return (
     <DataGrid
+      getRowId={(row) => row.documentHandleId}
       disableColumnFilter
       disableColumnSelector
       disableDensitySelector

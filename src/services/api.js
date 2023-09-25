@@ -1,11 +1,12 @@
 import axios from "axios";
 
 export const searchData = async (payload) => {
-  await axios.post("https://dummyjson.com/products/add", {
+ const res= await axios.post("https://claimspaymentdemo20230920153520.azurewebsites.net/api/getpaymentkeywords", {
     ...payload,
+  },{
+      headers: {
+        'content-type': 'text/json'
+    }
   });
-};
-export const getData = async (url) => {
-  const response = await axios.get(url);
-  return response.data;
+  return res.data
 };
